@@ -2,7 +2,7 @@
   "name": "jquery-overflowwatcher",
   "version": "1.0.0",
   "description": "mini plugin to trigger a custom \"fab.overflow\" event when an element overflows",
-  "main": "jquery.overflow.js",
+  "main": "jquery.overflowwatcher.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
