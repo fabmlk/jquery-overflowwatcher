@@ -1,5 +1,5 @@
 {
-  "name": "jquery-overflow",
+  "name": "jquery-overflowwatcher",
   "version": "1.0.0",
   "description": "mini plugin to trigger a custom \"fab.overflow\" event when an element overflows",
   "main": "jquery.overflow.js",
