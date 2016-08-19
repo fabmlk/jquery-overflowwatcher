@@ -1,0 +1,11 @@
+{
+  "name": "jquery-overflow",
+  "version": "1.0.0",
+  "description": "mini plugin to trigger a custom \"fab.overflow\" event when an element overflows",
+  "main": "jquery.overflow.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "fabien lanoux",
+  "license": "ISC"
+}
