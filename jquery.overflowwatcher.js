@@ -62,7 +62,7 @@
                 sensorsList[index].detach();
                 sensorsList.splice(index, 1);
             }
-            return;
+            return this;
         }
 
         var slackness = (options || {}).slackness || [0, 0];
@@ -72,5 +72,7 @@
 
         // save the sensor in our list
         sensorsList.push(this);
+
+	return this;
     };
 }));
