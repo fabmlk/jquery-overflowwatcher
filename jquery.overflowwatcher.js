@@ -1,5 +1,6 @@
 /**
- * Simple plugin to detect when an element overflows to trigger a 'fab.overflow' event on the element.
+ * TODO
+ *
  * It's a simple wrapper around ResizeSensor lib used in css-element-queries project: https://github.com/marcj/css-element-queries.
  * The up-to-date ResizeSensor can be found at:
  * https://github.com/marcj/css-element-queries/blob/master/src/ResizeSensor.js
@@ -21,58 +22,80 @@
         factory( jQuery , root.ResizeSensor);
     }
 }(this, function($ ,ResizeSensor) {
-
-    /**
-     * Keep tracks of all sensors added.
-     * @type {Array}
-     */
-    var sensorsList = [],
+    // detect simple overflow by default
+    var defaults = {
+        width: 0,
+        height: 0,
+        threshold: "down"
+    },
 
         /**
-         * The function that detects overflow based on ResizeSensor change size detection.
+         * TODO
          *
-         * @param {Array} slackness
+         * @param reference
+         * @param thresholdWidth
+         * @param thresholdHeight
+         * @param thresholdDirection
          */
-        triggerIfOverflow = function (slackness) {
+        checkSpaceAvailable = function (reference, thresholdWidth, thresholdHeight, thresholdDirection) {
+            var widthAvailable =  reference.outerWidth() - this.outerWidth(),
+                heightAvailable = reference.outerHeight() - this.outerHeight(),
+                eventParams = {}
+                ;
 
-            if (this.scrollWidth + slackness[0] > this.clientWidth || this.scrollHeight + slackness[1] > this.clientHeight) {
-                $(this).trigger("fab.overflow");
+            if (thresholdWidth) {
+                if (thresholdDirection === "up" && widthAvailable > thresholdWidth
+                    || thresholdDirection === "down" && widthAvailable < thresholdWidth) {
+                    eventParams.widthAvailable = widthAvailable;
+                }
             }
+
+            if (thresholdHeight) {
+                if (thresholdDirection === "up" && heightAvailable > thresholdHeight
+                    || thresholdDirection === "down" && heightAvailable < thresholdHeight) {
+                    eventParams.heightAvailable = heightAvailable;
+                }
+            }
+
+            this.trigger("relativeoverflow", eventParams);
+        },
+
+        destroy = function () {
+            this.resizeSensor.detach();
+            delete this.options;
+            delete this.resizeSensor;
         }
+
+    ;
 
     /**
-     * Options:
-     *  - slackness property:
-     *          An array of 2 integers that tells how many pixels we can spare when detecting the overflow.
-     *          A positive integer tells we can spare some overflown extra pixels.
-     *          A negative integer tells we must detect the overflow early.
-     *          The first element is the width overflow, the 2nd the height overflow.
-     *          When used, both integers must be present.
-     *
-     *  - string "detach":
-     *          Use it to detach the plugin and overflow detection
+     * TODO
      *
      * @param options
+     * @returns {$.fn}
      */
     $.fn.overflowWatcher = function (options) {
-        if (options === "detach") {
-            // find the jquery element, detach its sensor, and remove it from the list of sensors
-            var index = sensorsList.indexOf(this.resizeSensor);
-            if (index !== -1) {
-                sensorsList[index].detach();
-                sensorsList.splice(index, 1);
-            }
-            return this;
+        var element = this;
+
+        if (options === "destroy") {
+            destroy.call(element);
+
+            return element;
         }
 
-        var slackness = (options || {}).slackness || [0, 0];
+        options = $.extend({}, defaults, options || {});
 
-        // save instance on the jquery element and let ResizeSensor do its job to call our triggerIfOverflow callback on resize.
-        this.resizeSensor = new ResizeSensor(this[0], triggerIfOverflow.bind(this[0], slackness));
+        element.options = options;
 
-        // save the sensor in our list
-        sensorsList.push(this);
+        element.options.reference = options.reference || element.parent();
 
-	return this;
+        // save instance on the jquery element and let ResizeSensor do its job to call our callbacks on resize.
+        element.resizeSensor = new ResizeSensor(element[0], checkSpaceAvailable.bind(element,
+            element.options.reference,
+            element.options.width,
+            element.options.height,
+            element.options.threshold));
+
+	    return element;
     };
 }));
